@@ -2,13 +2,14 @@ name: Build IPA
 on: [push, workflow_dispatch]
 jobs:
   ipa:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - run: brew install xcodegen ldid
+      - run: xcodebuild -version && sw_vers
       - run: sh build.sh
       - uses: actions/upload-artifact@v4
         with:
