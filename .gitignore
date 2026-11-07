@@ -1,0 +1,6 @@
+node_modules/
+ios/Kiosk/web/
+ios/Kiosk/Info.plist
+ios/*.xcodeproj/
+ios/build/
+*.ipa

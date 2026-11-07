@@ -1,0 +1,16 @@
+name: Build IPA
+on: [push, workflow_dispatch]
+jobs:
+  ipa:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: brew install xcodegen ldid
+      - run: sh build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KidsTodo-ipa
+          path: KidsTodo.ipa
