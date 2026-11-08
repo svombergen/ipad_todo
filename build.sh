@@ -14,9 +14,12 @@ cd ios
 xcodegen generate
 xcodebuild -project KidsTodo.xcodeproj -scheme KidsTodo -configuration Release \
   -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
-  CODE_SIGNING_ALLOWED=NO CURRENT_PROJECT_VERSION="$BUILD" MARKETING_VERSION="1.0.$BUILD" build
+  CODE_SIGNING_ALLOWED=NO build
 
 APP=build/Build/Products/Release-iphoneos/KidsTodo.app
+# xcodegen writes literal 1.0 / 1 into Info.plist, so stamp the version here (before ldid re-signs). TrollStore shows ShortVersion.
+PB=/usr/libexec/PlistBuddy
+$PB -c "Set :CFBundleShortVersionString 1.0.$BUILD" -c "Set :CFBundleVersion $BUILD" "$APP/Info.plist"
 ldid -S "$APP/KidsTodo" # fake signature; TrollStore applies the real CoreTrust bypass on install
 
 rm -rf Payload ../KidsTodo.ipa
