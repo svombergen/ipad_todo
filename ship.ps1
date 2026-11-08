@@ -12,7 +12,7 @@ if (-not $NoPush) {
 }
 
 Remove-Item dist -Recurse -Force -ErrorAction SilentlyContinue
-$id = gh run list --workflow "Build IPA" --status success --limit 1 --json databaseId --jq '.[0].databaseId'
+if ($NoPush) { $id = gh run list --workflow "Build IPA" --status success --limit 1 --json databaseId --jq '.[0].databaseId' } # after a push, keep the id of the run we just watched (the list can lag behind)
 gh run download $id -n KidsTodo-ipa -D dist
 
 $ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.IPAddress -match '^(192\.168|10\.)' } | Select-Object -First 1).IPAddress
