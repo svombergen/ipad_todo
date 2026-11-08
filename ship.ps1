@@ -24,4 +24,5 @@ $url = "http://${ip}:8000/KidsTodo.ipa"
 "@ | Set-Content dist\index.html
 
 Write-Host "On iPad Safari open: http://${ip}:8000"
-python -m http.server 8000 -d dist
+Write-Host "Serving build $((Get-Content dist\version.json | ConvertFrom-Json).build). Ctrl+C to stop."
+python tools\serve.py

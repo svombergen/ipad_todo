@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-  State, activeKid, addKid, addTask, allDone, dayKey, doneCount, isDone, load,
-  removeKid, removeTask, renameKid, resetStars, rollover, toggle,
+  State, activeKid, addKid, addList, addTask, allDone, dayKey, doneCount, isDone, listTasks, load,
+  removeKid, removeList, removeTask, renameKid, renameList, resetStars, rollover, setList, setServer, toggle,
 } from './tasks'
 
+declare const __BUILD__: string
 const w = window as any
 const KEY = 'kids-todo'
 const EMOJIS = ['⭐', '🦷', '🛏️', '👕', '🥣', '🎒', '📚', '🧸', '🛁', '🐶', '🐱', '🌱', '🎹', '⚽', '🎨', '🧹', '🍎', '💧', '🚽', '🧦', '🙏', '😴', '🍽️', '✏️']
@@ -27,6 +28,7 @@ export default function App() {
   const [emoji, setEmoji] = useState(EMOJIS[0])
   const [kidName, setKidName] = useState('')
   const [avatar, setAvatar] = useState(AVATARS[0])
+  const [newBuild, setNewBuild] = useState(false)
   const holdTimer = useRef<number>()
   const pressedWhileEditing = useRef(false)
 
@@ -37,6 +39,19 @@ export default function App() {
     const t = setInterval(() => setS((s) => rollover(s, dayKey())), 30_000)
     return () => clearInterval(t)
   }, [])
+
+  // Ask the ship.ps1 server (same wifi) for a newer build on launch and whenever the app comes back to the foreground.
+  useEffect(() => {
+    const check = () =>
+      fetch(s.server + '/version.json?t=' + Date.now(), { cache: 'no-store' })
+        .then((r) => r.json())
+        .then((j) => setNewBuild(Number(j.build) > Number(__BUILD__)))
+        .catch(() => {}) // server off / other wifi: stay quiet
+    const onShow = () => document.visibilityState === 'visible' && check()
+    check()
+    document.addEventListener('visibilitychange', onShow)
+    return () => document.removeEventListener('visibilitychange', onShow)
+  }, [s.server])
 
   const kid = activeKid(s)
 
@@ -62,8 +77,9 @@ export default function App() {
   }
   const holdEnd = () => { setHolding(false); clearTimeout(holdTimer.current) }
 
+  const tasks = listTasks(s)
   const done = doneCount(s, kid)
-  const pct = s.tasks.length ? (done / s.tasks.length) * 100 : 0
+  const pct = tasks.length ? (done / tasks.length) * 100 : 0
 
   return (
     <div className="app">
@@ -85,6 +101,9 @@ export default function App() {
             </button>
           ))}
         </nav>
+        {newBuild && (
+          <button className="update" onClick={() => { location.href = 'apple-magnifier://install?url=' + s.server + '/KidsTodo.ipa' }}>⬆️ Update</button>
+        )}
         {/* One button: hold 🔒 to open, tap ✅ to close. The release after the hold must not count as a tap on ✅. */}
         <button
           className={editing ? 'pill' : 'lock' + (holding ? ' holding' : '')}
@@ -94,7 +113,24 @@ export default function App() {
         >{editing ? '✅ Klaar' : '🔒'}</button>
       </header>
 
-      <div className="progress"><div style={{ width: pct + '%' }} /><span>{done} / {s.tasks.length}</span></div>
+      <nav className="lists">
+        {s.lists.map((l) => (
+          <button key={l.id} className={'list' + (l.id === s.list ? ' on' : '')}
+            onClick={() => {
+              if (editing && l.id === s.list) { const n = prompt('Nieuwe naam:', l.name); n && setS(renameList(s, l.id, n.slice(0, 14))) }
+              else setS(setList(s, l.id))
+            }}>
+            {l.name}
+            {editing && s.lists.length > 1 && (
+              <span className="del" role="button" aria-label={l.name + ' verwijderen'}
+                onClick={(e) => { e.stopPropagation(); confirm(l.name + ' en alle taken erin verwijderen?') && setS(removeList(s, l.id)) }}>✖</span>
+            )}
+          </button>
+        ))}
+        {editing && <button className="list add" onClick={() => { const n = prompt('Naam nieuwe lijst:'); n && setS(addList(s, n.slice(0, 14))) }}>➕ Lijst</button>}
+      </nav>
+
+      <div className="progress"><div style={{ width: pct + '%' }} /><span>{done} / {tasks.length}</span></div>
 
       {editing && (
         <div className="editor">
@@ -114,6 +150,7 @@ export default function App() {
             <button className="pill" type="button" onClick={() => setPick(pick === 'avatar' ? null : 'avatar')}>{avatar} ▾</button>
             <input value={kidName} onChange={(e) => setKidName(e.target.value)} placeholder="Naam kind…" maxLength={12} />
             <button className="pill" type="submit">➕ Kind</button>
+            <button className="pill" type="button" onClick={() => { const v = prompt('Adres van de update-server:', s.server); v && setS(setServer(s, v)) }}>🔄 Server</button>
             <button className="pill warn" type="button" onClick={() => confirm('Alle sterren op 0 zetten?') && setS(resetStars(s))}>⭐ op 0</button>
           </form>
           {pick === 'avatar' && (
@@ -123,12 +160,12 @@ export default function App() {
               ))}
             </div>
           )}
-          <p className="hint">Tik op een kind om de naam te wijzigen.</p>
+          <p className="hint">Tik op een kind of de gekozen lijst om de naam te wijzigen. Nieuwe taken komen in de gekozen lijst. Versie {__BUILD__}.</p>
         </div>
       )}
 
       <main>
-        {s.tasks.map((t) => (
+        {tasks.map((t) => (
           <button key={t.id} className={'card' + (isDone(kid, t.id) ? ' done' : '')} onClick={() => tap(t.id)}>
             <span className="emoji">{t.emoji}</span>
             <span className="title">{t.title}</span>
@@ -138,7 +175,7 @@ export default function App() {
             )}
           </button>
         ))}
-        {!s.tasks.length && <p className="empty">Nog geen taken. Houd 🔒 ingedrukt om taken toe te voegen!</p>}
+        {!tasks.length && <p className="empty">Nog geen taken. Houd 🔒 ingedrukt om taken toe te voegen!</p>}
       </main>
 
       {party && (

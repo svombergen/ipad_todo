@@ -1,12 +1,14 @@
 import { expect, test } from 'vitest'
-import { activeKid, addKid, addTask, allDone, dayKey, doneCount, load, removeKid, removeTask, renameKid, resetStars, toggle } from './tasks'
+import { activeKid, addKid, addList, addTask, allDone, dayKey, doneCount, load, listTasks, removeKid, removeList, removeTask, renameKid, renameList, resetStars, setList, setServer, toggle } from './tasks'
 
 test('tasks logic', () => {
   expect(dayKey(new Date(2026, 0, 5))).toBe('2026-01-05')
 
   // empty / corrupt -> defaults
   const s = load(null, '2026-01-05')
-  expect(s.tasks.length).toBe(8)
+  expect(s.tasks.length).toBe(9)
+  expect(s.lists.map((l) => l.name)).toEqual(['Ochtend', 'Avond'])
+  expect(listTasks(s).length).toBe(5)
   expect(s.kids.length).toBe(2)
   expect(s.active).toBe(s.kids[0].id)
   expect(load('{garbage', 'd').kids.length).toBe(2)
@@ -30,8 +32,8 @@ test('tasks logic', () => {
   expect(next.kids[0].stars).toBe(1)
 
   // tasks: add trims/ignores blank; remove drops ticks too
-  expect(addTask(s, '🐶', '  ').tasks.length).toBe(8)
-  expect(addTask(s, '🐶', ' Hond voeren ').tasks[8].title).toBe('Hond voeren')
+  expect(addTask(s, '🐶', '  ').tasks.length).toBe(9)
+  expect(addTask(s, '🐶', ' Hond voeren ').tasks[9].title).toBe('Hond voeren')
   expect(removeTask(a, t).kids[0].done).toEqual([])
 
   // allDone is per kid
@@ -50,6 +52,30 @@ test('tasks logic', () => {
   expect(d.kids.length).toBe(1)
   expect(d.active).toBe(k2.id)
   expect(removeKid(d, k2.id).kids.length).toBe(1)
+
+  // lists: switch, add/rename, remove takes tasks + ticks along, never the last, old saves migrate
+  const [morning, evening] = s.lists
+  const e = setList(s, evening.id)
+  expect(listTasks(e).length).toBe(4)
+  expect(setList(s, 'nope')).toBe(s)
+  expect(addTask(e, '🐶', 'Hond').tasks[9].list).toBe(evening.id)
+  expect(addList(s, ' Middag ').list).not.toBe(s.list)
+  expect(addList(s, ' ').lists.length).toBe(2)
+  expect(renameList(s, morning.id, 'Vroeg').lists[0].name).toBe('Vroeg')
+  const ticked = toggle(s, k1.id, t)
+  const r = removeList(ticked, morning.id)
+  expect(r.tasks.length).toBe(4)
+  expect(r.kids[0].done).toEqual([])
+  expect(r.list).toBe(evening.id)
+  expect(removeList(r, evening.id).lists.length).toBe(1)
+  const old = load(JSON.stringify({ tasks: [{ id: 'x', emoji: '⭐', title: 'Oud' }] }), 'd')
+  expect(listTasks(old).map((t) => t.title)).toEqual(['Oud'])
+
+  // server: default, normalised, persisted
+  expect(s.server).toBe('http://192.168.2.9:8000')
+  expect(setServer(s, ' 10.0.0.5:8000/ ').server).toBe('http://10.0.0.5:8000')
+  expect(setServer(s, ' ')).toBe(s)
+  expect(load(JSON.stringify(setServer(s, 'http://x:1')), 'd').server).toBe('http://x:1')
 
   expect(resetStars(a).kids[0].stars).toBe(0)
 })

@@ -76,7 +76,10 @@ final class KioskViewController: UIViewController, WKNavigationDelegate, WKUIDel
     // MARK: Offline lock-down + crash recovery
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        let scheme = navigationAction.request.url?.scheme
+        let url = navigationAction.request.url
+        let scheme = url?.scheme
+        // Update button: hand the TrollStore install link to iOS.
+        if scheme == "apple-magnifier", let url { UIApplication.shared.open(url) }
         decisionHandler(scheme == "app" || scheme == "about" ? .allow : .cancel)
     }
 

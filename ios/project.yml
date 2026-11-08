@@ -29,6 +29,10 @@ targets:
         CFBundleDisplayName: Mijn dag
         CFBundleDevelopmentRegion: nl
         UILaunchScreen: {}
+        NSLocalNetworkUsageDescription: Zoekt naar app-updates op de computer.
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+          NSAllowsArbitraryLoadsInWebContent: true # update check fetches http://<pc>:8000
         UIRequiresFullScreen: true
         UIStatusBarHidden: true
         UIViewControllerBasedStatusBarAppearance: true
