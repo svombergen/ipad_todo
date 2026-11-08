@@ -155,3 +155,5 @@ export const setServer = (s: State, server: string): State => {
   const v = server.trim().replace(/\/+$/, '')
   return v ? { ...s, server: /^https?:\/\//.test(v) ? v : 'http://' + v } : s
 }
+
+export const resetTicks = (s: State): State => ({ ...s, kids: s.kids.map((k) => ({ ...k, done: [] })) })

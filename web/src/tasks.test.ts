@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { activeKid, addKid, addList, addTask, allDone, dayKey, doneCount, load, listTasks, removeKid, removeList, removeTask, renameKid, renameList, resetStars, setList, setServer, toggle } from './tasks'
+import { activeKid, addKid, addList, addTask, allDone, dayKey, doneCount, load, listTasks, removeKid, removeList, removeTask, renameKid, renameList, resetStars, resetTicks, setList, setServer, toggle } from './tasks'
 
 test('tasks logic', () => {
   expect(dayKey(new Date(2026, 0, 5))).toBe('2026-01-05')
@@ -78,4 +78,6 @@ test('tasks logic', () => {
   expect(load(JSON.stringify(setServer(s, 'http://x:1')), 'd').server).toBe('http://x:1')
 
   expect(resetStars(a).kids[0].stars).toBe(0)
+  expect(resetTicks(a).kids[0].done).toEqual([])
+  expect(resetTicks(a).kids[0].stars).toBe(1)
 })

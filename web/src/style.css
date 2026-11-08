@@ -25,9 +25,11 @@ h1 { font-size: 40px; font-weight: 800; white-space: nowrap; overflow: hidden; t
 .list { position: relative; font-size: 24px; font-weight: 800; padding: 10px 28px; border-radius: 30px; background: #fff6; }
 .list.on { background: #fff; box-shadow: 0 0 0 4px #7a5cff; }
 .list .del { position: absolute; top: -8px; right: -8px; width: 32px; height: 32px; line-height: 32px; font-size: 16px; border-radius: 50%; background: #ff5a5a; color: #fff; }
+.side { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.srv { font-size: 14px; padding: 4px 12px; border-radius: 14px; background: #fff4; color: #3b2f63aa; }
 .update { font-size: 16px; font-weight: 700; padding: 6px 14px; border-radius: 20px; background: #fff6; color: #3b2f63; }
 .date { font-size: 22px; opacity: .7; }
-.lock { font-size: 30px; width: 64px; height: 64px; border-radius: 50%; background: #fff6; position: relative; }
+.lock { font-size: 40px; line-height: 1; width: 72px; height: 72px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #fff6; position: relative; }
 .lock.holding::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 6px solid #7a5cff; animation: grow 2s linear; }
 @keyframes grow { from { transform: scale(.3); opacity: .2; } to { transform: scale(1); opacity: 1; } }
 

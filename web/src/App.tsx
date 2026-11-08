@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   State, activeKid, addKid, addList, addTask, allDone, dayKey, doneCount, isDone, listTasks, load,
-  removeKid, removeList, removeTask, renameKid, renameList, resetStars, rollover, setList, setServer, toggle,
+  removeKid, removeList, removeTask, renameKid, renameList, resetStars, resetTicks, rollover, setList, setServer, toggle,
 } from './tasks'
 
 declare const __BUILD__: string
@@ -104,13 +104,18 @@ export default function App() {
         {newBuild && (
           <button className="update" onClick={() => { location.href = 'apple-magnifier://install?url=' + s.server + '/KidsTodo.ipa' }}>⬆️ Update</button>
         )}
+        <div className="side">
         {/* One button: hold 🔒 to open, tap ✅ to close. The release after the hold must not count as a tap on ✅. */}
         <button
           className={editing ? 'pill' : 'lock' + (holding ? ' holding' : '')}
           aria-label={editing ? 'Klaar' : 'Oudermodus (vasthouden)'}
           onPointerDown={holdStart} onPointerUp={holdEnd} onPointerLeave={holdEnd} onPointerCancel={holdEnd}
-          onClick={() => { if (pressedWhileEditing.current) { setEditing(false); setPick(null); setS(resetStars(s)) } }} // scores reset after every parent visit
+          onClick={() => { if (pressedWhileEditing.current) { setEditing(false); setPick(null); setS(resetTicks(resetStars(s))) } }} // stars and ticks reset after every parent visit
         >{editing ? '✅ Klaar' : '🔒'}</button>
+        {editing && (
+          <button className="srv" onClick={() => { const v = prompt('Adres van de update-server:', s.server); v && setS(setServer(s, v)) }}>🔄 Server</button>
+        )}
+        </div>
       </header>
 
       <nav className="lists">
@@ -150,7 +155,6 @@ export default function App() {
             <button className="pill" type="button" onClick={() => setPick(pick === 'avatar' ? null : 'avatar')}>{avatar} ▾</button>
             <input value={kidName} onChange={(e) => setKidName(e.target.value)} placeholder="Naam kind…" maxLength={12} />
             <button className="pill" type="submit">➕ Kind</button>
-            <button className="pill" type="button" onClick={() => { const v = prompt('Adres van de update-server:', s.server); v && setS(setServer(s, v)) }}>🔄 Server</button>
             <button className="pill warn" type="button" onClick={() => confirm('Alle sterren op 0 zetten?') && setS(resetStars(s))}>⭐ op 0</button>
           </form>
           {pick === 'avatar' && (
