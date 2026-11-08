@@ -155,7 +155,6 @@ export default function App() {
             <button className="pill" type="button" onClick={() => setPick(pick === 'avatar' ? null : 'avatar')}>{avatar} ▾</button>
             <input value={kidName} onChange={(e) => setKidName(e.target.value)} placeholder="Naam kind…" maxLength={12} />
             <button className="pill" type="submit">➕ Kind</button>
-            <button className="pill warn" type="button" onClick={() => confirm('Alle sterren op 0 zetten?') && setS(resetStars(s))}>⭐ op 0</button>
           </form>
           {pick === 'avatar' && (
             <div className="emojis">

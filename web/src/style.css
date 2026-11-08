@@ -34,7 +34,6 @@ h1 { font-size: 40px; font-weight: 800; white-space: nowrap; overflow: hidden; t
 @keyframes grow { from { transform: scale(.3); opacity: .2; } to { transform: scale(1); opacity: 1; } }
 
 .pill { background: #7a5cff; color: #fff; font-size: 22px; font-weight: 700; padding: 12px 22px; border-radius: 30px; }
-.pill.warn { background: #ff7a7a; }
 
 .progress { position: relative; height: 34px; background: #fff7; border-radius: 20px; overflow: hidden; }
 .progress div { height: 100%; background: linear-gradient(90deg, #5be39a, #2fc777); transition: width .4s; }
@@ -66,7 +65,7 @@ main {
 .editor .hint { font-size: 16px; opacity: .6; }
 .editor input { flex: 1; font-size: 26px; padding: 10px 16px; border-radius: 16px; border: 3px solid #d6cdfc; }
 .emojis { display: flex; flex-wrap: wrap; gap: 6px; }
-.emojis button { font-size: 30px; width: 52px; height: 52px; border-radius: 14px; background: #f1edff; }
+.emojis button { font-size: 30px; line-height: 1; width: 52px; height: 52px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: #f1edff; }
 .emojis button.on { background: #7a5cff; }
 
 .party { position: fixed; inset: 0; background: #3b2f6399; overflow: hidden; display: flex; align-items: center; justify-content: center; }

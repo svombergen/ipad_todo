@@ -11,9 +11,8 @@ An offline React app bundled inside a fullscreen Swift/WKWebView shell. It is la
   - add or delete (✖) tasks
   - add or delete kids
   - tap a kid to rename them
-  - reset all stars
   - icon pickers are collapsed: tap the icon button to see the options
-  - **leaving parent mode (✅ Klaar) resets all stars to 0**
+  - **leaving parent mode (✅ Klaar) resets all stars and ticks**
 - **Updates:** the app checks `<server>/version.json` on launch and whenever it comes back to the foreground (set the address with 🔄 Server in parent mode). When CI built something newer, a small ⬆️ Update button appears in the header; it opens the TrollStore install link. TrollStore → Settings → URL Scheme must be on. The build number is the GitHub Actions run number (bumps on every push) and shows in parent mode.
 - Data is stored in `Documents/state.json` in the app sandbox.
 

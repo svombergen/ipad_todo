@@ -14,7 +14,7 @@ cd ios
 xcodegen generate
 xcodebuild -project KidsTodo.xcodeproj -scheme KidsTodo -configuration Release \
   -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
-  CODE_SIGNING_ALLOWED=NO CURRENT_PROJECT_VERSION="$BUILD" build
+  CODE_SIGNING_ALLOWED=NO CURRENT_PROJECT_VERSION="$BUILD" MARKETING_VERSION="1.0.$BUILD" build
 
 APP=build/Build/Products/Release-iphoneos/KidsTodo.app
 ldid -S "$APP/KidsTodo" # fake signature; TrollStore applies the real CoreTrust bypass on install
