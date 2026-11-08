@@ -22,6 +22,7 @@ export default function App() {
   const [editing, setEditing] = useState(false)
   const [party, setParty] = useState(false)
   const [holding, setHolding] = useState(false)
+  const [pick, setPick] = useState<'emoji' | 'avatar' | null>(null) // which icon grid is open
   const [title, setTitle] = useState('')
   const [emoji, setEmoji] = useState(EMOJIS[0])
   const [kidName, setKidName] = useState('')
@@ -89,7 +90,7 @@ export default function App() {
           className={editing ? 'pill' : 'lock' + (holding ? ' holding' : '')}
           aria-label={editing ? 'Klaar' : 'Oudermodus (vasthouden)'}
           onPointerDown={holdStart} onPointerUp={holdEnd} onPointerLeave={holdEnd} onPointerCancel={holdEnd}
-          onClick={() => pressedWhileEditing.current && setEditing(false)}
+          onClick={() => { if (pressedWhileEditing.current) { setEditing(false); setPick(null); setS(resetStars(s)) } }} // scores reset after every parent visit
         >{editing ? '✅ Klaar' : '🔒'}</button>
       </header>
 
@@ -98,26 +99,30 @@ export default function App() {
       {editing && (
         <div className="editor">
           <form className="row" onSubmit={(e) => { e.preventDefault(); setS(addTask(s, emoji, title)); setTitle('') }}>
-            <span className="big">{emoji}</span>
+            <button className="pill" type="button" onClick={() => setPick(pick === 'emoji' ? null : 'emoji')}>{emoji} ▾</button>
             <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Nieuwe taak…" maxLength={30} />
             <button className="pill" type="submit">➕ Taak</button>
           </form>
-          <div className="emojis">
-            {EMOJIS.map((e) => (
-              <button key={e} className={e === emoji ? 'on' : ''} onClick={() => setEmoji(e)}>{e}</button>
-            ))}
-          </div>
+          {pick === 'emoji' && (
+            <div className="emojis">
+              {EMOJIS.map((e) => (
+                <button key={e} className={e === emoji ? 'on' : ''} onClick={() => { setEmoji(e); setPick(null) }}>{e}</button>
+              ))}
+            </div>
+          )}
           <form className="row" onSubmit={(e) => { e.preventDefault(); setS(addKid(s, avatar, kidName)); setKidName('') }}>
-            <span className="big">{avatar}</span>
+            <button className="pill" type="button" onClick={() => setPick(pick === 'avatar' ? null : 'avatar')}>{avatar} ▾</button>
             <input value={kidName} onChange={(e) => setKidName(e.target.value)} placeholder="Naam kind…" maxLength={12} />
             <button className="pill" type="submit">➕ Kind</button>
             <button className="pill warn" type="button" onClick={() => confirm('Alle sterren op 0 zetten?') && setS(resetStars(s))}>⭐ op 0</button>
           </form>
-          <div className="emojis">
-            {AVATARS.map((a) => (
-              <button key={a} className={a === avatar ? 'on' : ''} onClick={() => setAvatar(a)}>{a}</button>
-            ))}
-          </div>
+          {pick === 'avatar' && (
+            <div className="emojis">
+              {AVATARS.map((a) => (
+                <button key={a} className={a === avatar ? 'on' : ''} onClick={() => { setAvatar(a); setPick(null) }}>{a}</button>
+              ))}
+            </div>
+          )}
           <p className="hint">Tik op een kind om de naam te wijzigen.</p>
         </div>
       )}

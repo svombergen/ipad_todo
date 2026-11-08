@@ -11,6 +11,8 @@ An offline React app bundled inside a fullscreen Swift/WKWebView shell. It is la
   - add or delete kids
   - tap a kid to rename them
   - reset all stars
+  - icon pickers are collapsed: tap the icon button to see the options
+  - **leaving parent mode (✅ Klaar) resets all stars to 0**
 - Data is stored in `Documents/state.json` in the app sandbox.
 
 ## Develop (any OS)

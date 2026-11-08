@@ -4,3 +4,5 @@ ios/Kiosk/Info.plist
 ios/*.xcodeproj/
 ios/build/
 *.ipa
+
+dist/
