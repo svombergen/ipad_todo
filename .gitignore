@@ -8,3 +8,8 @@ ios/build/
 dist/
 version.json
 __pycache__/
+diary/web/node_modules/
+diary/ios/Kiosk/web/
+diary/ios/Kiosk/Info.plist
+diary/ios/*.xcodeproj/
+diary/ios/build/

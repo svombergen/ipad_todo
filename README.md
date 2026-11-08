@@ -46,3 +46,22 @@ AirDrop or copy `KidsTodo.ipa` to the iPad, open it with TrollStore, and tap Ins
 ## Lock it down
 
 The iPad Air 2 has a home button, so the app alone can't stop a kid from leaving it. Use **Guided Access** to lock the device to the app: Settings → Accessibility → Guided Access → On, set a passcode, open the app, and triple-click the home button.
+
+# Dagboek (second app, `diary/`)
+
+Registration diary, e.g. every time of peeing with the amount in ml. Same stack as above (React in a WKWebView shell, installed with TrollStore), bundle id `local.kiosk.dagboek`.
+
+- **Registreer:** one big button per category (e.g. Drinken, Plassen). A category with options shows them after the tap (Drankje 200 ml, Drankje 300 ml, Yoghurt (250gr) 150 ml, "Anders…" for a free amount): one more tap saves. A category without options or unit saves on the first tap. Date and time are always the moment of the tap (never typed). A toast offers *Ongedaan* for 6 s.
+- **Overzicht:** *Grafiek* (stacked bars of the ml amounts, one color per category; starts at hours / days / months depending on the data, tap a bar to drill down) or *Lijst* (per day with totals, delete). Period filter: vandaag / 7 dagen / alles.
+- **Export** (from *Lijst*, what you see is what you export): PDF (paginated A4), plain text, JSON. All through the iOS share sheet: save to Files, Mail, AirDrop…
+- **Lijsten:** create/edit categories with name, icon, optional unit and options (name + amount). Deleting a category keeps old registrations. Also holds the update button.
+- Data in `Documents/state.json`. Updates work like the kids app, from `<server>/diary/version.json` and `/diary/Diary.ipa`; the *Nieuwe versie installeren* button (and a red dot on the *Lijsten* tab) appears when CI built something newer.
+
+```sh
+cd diary/web && npm install && npm run dev   # browser, localStorage
+sh build.sh diary Diary                        # on a Mac: outputs diary/Diary.ipa
+python tools/make_diary_icon.py                # regenerate the icon
+```
+CI builds both IPAs in the same run; they share the build number.
+
+`ship.ps1` serves a start page with, per IPA: install in TrollStore, download, and **Preview (iPad)**. The preview unpacks the web app from the IPA and shows it in an iPad-sized frame in the browser (state in localStorage, no iOS shell, so sharing/PDF falls back to a file download).

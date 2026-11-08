@@ -11,9 +11,12 @@ jobs:
       - run: brew install xcodegen ldid
       - run: xcodebuild -version && sw_vers
       - run: sh build.sh
+      - run: sh build.sh diary Diary
       - uses: actions/upload-artifact@v4
         with:
           name: KidsTodo-ipa
           path: |
             KidsTodo.ipa
             version.json
+            diary/Diary.ipa
+            diary/version.json
